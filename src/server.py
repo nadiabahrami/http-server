@@ -8,17 +8,22 @@ def server():
     server.bind(address)
     server.listen(1)
     conn, addr = server.accept()
-
-    buffer_length = 8
-    reply_complete = False
-    full_string = ""
-    while not reply_complete:
-        part = conn.recv(buffer_length)
-        full_string = full_string + part.decode('utf8')
-        if len(part) < buffer_length:  #add a time out or a zero byte push
-            reply_complete = True
-    print(full_string)
-
-    conn.sendall(full_string.encode('utf8'))
+    try:
+        while True:
+            buffer_length = 8
+            reply_complete = False
+            full_string = ""
+            while not reply_complete:
+                part = conn.recv(buffer_length)
+                full_string = full_string + part.decode('utf8')
+                if len(part) < buffer_length:  #add a time out or a zero byte push
+                    reply_complete = True
+            print(full_string)
+            conn.sendall(full_string.encode('utf8'))
+            server.listen(1)
+            conn, addr = server.accept()
+    except KeyboardInterrupt:
+    	conn.close()
+    	server.close()
 
 server()

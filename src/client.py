@@ -18,6 +18,7 @@ def client_send(message):
         full_string = full_string + part.decode('utf8')
         if len(part) < buffer_length:  #add a time out or a zero byte push
             reply_complete = True
+            client.close()
     print(full_string)
 
 
