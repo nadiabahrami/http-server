@@ -28,5 +28,4 @@ def server():
     except KeyboardInterrupt:
     	conn.close()
     	server.close()
-
 server()

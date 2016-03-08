@@ -31,7 +31,6 @@ def client(message):
     print(full_string)
     return full_string
 
-
 if __name__ == '__main__':
     message = sys.argv[1]
     client(message)
