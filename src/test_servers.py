@@ -19,3 +19,7 @@ def test_client():
     assert client(message4) == message4
     assert client(message5) == message5
     assert client(message6) == message6
+
+
+def test_response_ok():
+    """Assert

@@ -43,19 +43,22 @@ def server():
     conn, addr = server.accept()
     try:
         while True:
-            buffer_length = 8
-            reply_complete = False
-            full_string = u""
-            while not reply_complete:
-                part = conn.recv(buffer_length)
-                full_string = full_string + part.decode('utf-8')
-                if len(part) < buffer_length:
-                    reply_complete = True
-            print(full_string)
-            print(response_ok())
-            conn.sendall(response_ok().encode('utf-8'))
-            server.listen(1)
-            conn, addr = server.accept()
+            try:
+                buffer_length = 8
+                reply_complete = False
+                full_string = u""
+                while not reply_complete:
+                    part = conn.recv(buffer_length)
+                    full_string = full_string + part.decode('utf-8')
+                    if len(part) < buffer_length:
+                        reply_complete = True
+                print(full_string)
+                conn.sendall(response_ok().encode('utf-8'))
+                server.listen(1)
+                conn, addr = server.accept()
+            except:
+                response_error()
+                raise
     except KeyboardInterrupt:
     	conn.close()
     	server.close()
