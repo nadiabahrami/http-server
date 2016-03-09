@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -​*- coding: utf-8 -*​-
 """Server module."""
 from __future__ import unicode_literals
 import socket
@@ -19,13 +19,14 @@ def server():
             while not reply_complete:
                 part = conn.recv(buffer_length)
                 full_string = full_string + part.decode('utf-8')
-                if len(part) < buffer_length:  #add a time out or a zero byte push
+                if len(part) < buffer_length:  
                     reply_complete = True
             print(full_string)
             conn.sendall(full_string.encode('utf-8'))
             server.listen(1)
             conn, addr = server.accept()
     except KeyboardInterrupt:
-    	conn.close()
-    	server.close()
+        conn.close()
+        server.close()
+
 server()
