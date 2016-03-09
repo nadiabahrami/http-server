@@ -33,11 +33,11 @@ def response_error():
     return string_list
 
 
-def http_server():
+def server():
     """Return message to client."""
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-    address = ('127.0.0.1', 5000)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    address = ('127.0.0.1', 5001)
     server.bind(address)
     server.listen(1)
     conn, addr = server.accept()
@@ -60,9 +60,12 @@ def http_server():
                 response_error()
                 raise
     except KeyboardInterrupt:
-    	conn.close()
-    	server.close()
-server()
+        conn.close()
+        server.close()
+
+if __name__ == '__main__':
+    server()
+
 
 
 
