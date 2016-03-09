@@ -1,5 +1,5 @@
 # -​*- coding: utf-8 -*​-
-"""Client module."""
+"""Client module for echo server."""
 from __future__ import unicode_literals
 import socket
 import sys
