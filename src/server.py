@@ -33,7 +33,7 @@ def response_error():
     return string_list
 
 
-def server():
+def http_server():
     """Return message to client."""
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
     address = ('127.0.0.1', 5000)
