@@ -1,21 +1,34 @@
 # -*- coding: utf-8 -*-
 """Test client module."""
-from __future__ import unicode_literals
-import pytest
 
 
-def test_client():
-    """Assert sent message and recieved message are the same."""
-    from client import client
-    message = 'Hey this works.'
-    message2 = 'one'
-    message3 = 'Hey this is a really long message and it will be sent totally. Yeah.'
-    message4 = 'abcdefgh'
-    message5 = 'ç'
-    message6 = 'one\n'
-    assert client(message) == message
-    assert client(message2) == message2
-    assert client(message3) == message3
-    assert client(message4) == message4
-    assert client(message5) == message5
-    assert client(message6) == message6
+def test_response_ok_status():
+    """Test for lead line in HTTP response."""
+    from server import response_ok
+    output_ = 'HTTP/1.1 200 OK'
+    http_list = response_ok().split('\r\n')
+    assert http_list[0] == output_
+
+
+def test_response_ok_content_type():
+    """Test for Content-Type in HTTP response header."""
+    from server import response_ok
+    output_ = 'Content-Type: text/plain; charset=utf-8'
+    http_list = response_ok().split('\r\n')
+    assert http_list[1] == output_
+
+
+def test_response_ok_header_break():
+    """Test for break between header and body in HTTP response header."""
+    from server import response_ok
+    output_ = ''
+    http_list = response_ok().split('\r\n')
+    assert http_list[4] == output_
+
+
+def test_response_error():
+    """Test first line of server faliure response message."""
+    from server import response_error
+    output_ = 'HTTP/1.1 500 Internal Server Error'
+    http_list = response_error().split('\r\n')
+    assert http_list[0] == output_
