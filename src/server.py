@@ -5,30 +5,30 @@ import socket
 import email.utils
 
 
-def response_ok(body):
+def response_ok():
     """Return 200 ok."""
-    first_line = 'HTTP/1.1 200 OK'
-    second_line = 'Content-Type: text/plain; charset=utf-8'
-    # date_line = 'Date: {}'.format(email.utils.formatdate(usegmt=True))
-    header_break = '\r\n'
+    first_line = u'HTTP/1.1 200 OK'
+    second_line = u'Content-Type: text/plain; charset=utf-8'
+    date_line = u'Date: ' + email.utils.formatdate(usegmt=True)
+    header_break = u''
+    body = u'It is all good'
     bytes = body.encode('utf-8')
-    fourth_line = 'Content-Length: {}'.format(len(bytes))
-    body_message = 'Body: It is all good'
-    string_list = [first_line, second_line, fourth_line, header_break, body_message]
+    fourth_line = u'Content-Length: {}'.format(len(bytes))
+    string_list = [first_line, second_line, date_line, fourth_line, header_break, body]
     string_list = '\r\n'.join(string_list)
     return string_list
 
 
-def response_error(body):
+def response_error():
     """Return 500 internal server error."""
-    first_line = 'HTTP/1.1 500 Internal Server Error'
-    second_line = 'Content-Type: text/plain; charset=utf-8'
-    # date_line = email.utils.formatdate(usegmt=True)
-    header_break = '<CRLF>'
+    first_line = u'HTTP/1.1 500 Internal Server Error'
+    second_line = u'Content-Type: text/plain; charset=utf-8'
+    date_line = email.utils.formatdate(usegmt=True)
+    header_break = u''
+    body = u'The system is down'
     bytes = body.encode('utf-8')
-    fourth_line = 'Content-Length: {}'.format(len(bytes))
-    body_message = 'Body: The system is down'
-    string_list = [first_line, second_line, fourth_line, header_break, body_message]
+    fourth_line = u'Content-Length: {}'.format(len(bytes))
+    string_list = [first_line, second_line, date_line, fourth_line, header_break, body]
     string_list = '\r\n'.join(string_list)
     return string_list
 
@@ -52,9 +52,8 @@ def server():
                 if len(part) < buffer_length:
                     reply_complete = True
             print(full_string)
-            body = full_string
-            print(response_ok(body))
-            conn.sendall(response_ok(body).encode('utf-8'))
+            print(response_ok())
+            conn.sendall(response_ok().encode('utf-8'))
             server.listen(1)
             conn, addr = server.accept()
     except KeyboardInterrupt:
