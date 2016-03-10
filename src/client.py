@@ -31,6 +31,13 @@ def client(message):
     print(full_string)
     return full_string
 
+
+def client_request_header():
+    """Return client request header."""
+    first = u'GET / HTTP/1.1'
+    return first
+
+
 if __name__ == '__main__':
     message = sys.argv[1]
     client(message)
