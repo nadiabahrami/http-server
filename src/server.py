@@ -5,6 +5,11 @@ import socket
 import email.utils
 
 
+def resolve_uri(uri):
+
+
+
+
 def parse_request(request):
     """Parse and validate request to confirm parts are correct."""
     lines = request.split('\r\n')
@@ -20,10 +25,12 @@ def parse_request(request):
         raise RuntimeError('Only accepts HTTP/1.1 protocol requests.')
     try:
         len(lines[1].split()) == 3 and lines[1][0] == '/'
+        uri = lines[1].split()
+        lines = resolve_uri(uri)
     except:
         response_error(u'404 Page Not Found')
         raise RuntimeError('URI not properly formatted.')
-    return lines[1]
+    return lines
 
 
 def response_ok(uri):
@@ -33,8 +40,8 @@ def response_ok(uri):
     date = u'Date: ' + email.utils.formatdate(usegmt=True)
     header_break = u''
     body = uri
-    bytes = body.encode('utf-8')
-    fourth_line = u'Content-Length: {}'.format(len(bytes))
+    bytes_ = body.encode('utf-8')
+    fourth_line = u'Content-Length: {}'.format(len(bytes_))
     string_list = [first, second_line, date, fourth_line, header_break, body]
     string_list = '\r\n'.join(string_list)
     return string_list
@@ -47,8 +54,8 @@ def response_error(error='500 Internal Server Error'):
     date = email.utils.formatdate(usegmt=True)
     header_break = u''
     body = u'The system is down'
-    bytes = body.encode('utf-8')
-    fourth_line = u'Content-Length: {}'.format(len(bytes))
+    bytes_ = body.encode('utf-8')
+    fourth_line = u'Content-Length: {}'.format(len(bytes_))
     string_list = [first, second_line, date, fourth_line, header_break, body]
     string_list = '\r\n'.join(string_list)
     return string_list
