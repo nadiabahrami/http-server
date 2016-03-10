@@ -5,30 +5,51 @@ import socket
 import email.utils
 
 
-def response_ok():
+def parse_request(request):
+    """Parse and validate request to confirm parts are correct."""
+    lines = request.split('\r\n')
+    try:
+        lines[1][:3] == 'GET'
+    except:
+        response_error(u'405 Method Not Allowed')
+        raise RuntimeError('Only accepts GET requests.')
+    try:
+        lines[1][-8:] == 'HTTP/1.1'
+    except:
+        response_error(u'505 HTTP Version Not Supported')
+        raise RuntimeError('Only accepts HTTP/1.1 protocol requests.')
+    try:
+        len(lines[1].split()) == 3 and lines[1][0] == '/'
+    except:
+        response_error(u'404 Page Not Found')
+        raise RuntimeError('URI not properly formatted.')
+    return lines[1]
+
+
+def response_ok(uri):
     """Return 200 ok."""
-    first_line = u'HTTP/1.1 200 OK'
+    first = u'HTTP/1.1 200 OK'
     second_line = u'Content-Type: text/plain; charset=utf-8'
-    date_line = u'Date: ' + email.utils.formatdate(usegmt=True)
+    date = u'Date: ' + email.utils.formatdate(usegmt=True)
     header_break = u''
-    body = u'It is all good'
+    body = uri
     bytes = body.encode('utf-8')
     fourth_line = u'Content-Length: {}'.format(len(bytes))
-    string_list = [first_line, second_line, date_line, fourth_line, header_break, body]
+    string_list = [first, second_line, date, fourth_line, header_break, body]
     string_list = '\r\n'.join(string_list)
     return string_list
 
 
-def response_error():
+def response_error(error='500 Internal Server Error'):
     """Return 500 internal server error."""
-    first_line = u'HTTP/1.1 500 Internal Server Error'
+    first = u'HTTP/1.1 {}'.format(error)
     second_line = u'Content-Type: text/plain; charset=utf-8'
-    date_line = email.utils.formatdate(usegmt=True)
+    date = email.utils.formatdate(usegmt=True)
     header_break = u''
     body = u'The system is down'
     bytes = body.encode('utf-8')
     fourth_line = u'Content-Length: {}'.format(len(bytes))
-    string_list = [first_line, second_line, date_line, fourth_line, header_break, body]
+    string_list = [first, second_line, date, fourth_line, header_break, body]
     string_list = '\r\n'.join(string_list)
     return string_list
 
@@ -53,14 +74,18 @@ def server():
                     if len(part) < buffer_length:
                         reply_complete = True
                 print(full_string)
-                conn.sendall(response_ok().encode('utf-8'))
-                server.listen(1)
+                try:
+                    conn.sendall(response_ok(parse_request(full_string)).encode('utf-8'))
+                except:
+                    pass
+                # server.listen(1)
                 conn, addr = server.accept()
             except:
                 response_error()
                 raise
     except KeyboardInterrupt:
         conn.close()
+    finally:
         server.close()
 
 if __name__ == '__main__':
