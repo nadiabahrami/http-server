@@ -5,6 +5,24 @@ import socket
 import email.utils
 
 
+def parse_request(request):
+    """Parse and validate request to confirm parts are correct."""
+    lines = requet.split('\r\n')
+    if lines[1][:3] == 'GET':
+        pass
+    else:
+        raise RuntimeError('Only accepts GET requests.')
+    if lines[1][-8:] == 'HTTP/1.1':
+        pass
+    else:
+        raise RuntimeError('Only accepts HTTP/1.1 protocol requests.')
+    if len(lines[1].split()) == 3 and lines[1][0] == '/':
+        pass
+    else:
+        raise RuntimeError('URI not properly formatted.')
+    return lines[1]
+
+
 def response_ok():
     """Return 200 ok."""
     first_line = u'HTTP/1.1 200 OK'
@@ -53,6 +71,7 @@ def server():
                     if len(part) < buffer_length:
                         reply_complete = True
                 print(full_string)
+                # parse_request(full_string)
                 conn.sendall(response_ok().encode('utf-8'))
                 server.listen(1)
                 conn, addr = server.accept()
