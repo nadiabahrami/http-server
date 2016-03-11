@@ -1,2 +1,3 @@
 # http-server
-making a socket echo server
+Making a server that returns the requested URI
+
