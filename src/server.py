@@ -10,13 +10,15 @@ import io
 def resolve_uri(uri):
     """Return request body and file type."""
     root = os.getcwd() + '/webroot' + uri
+    print('this is the uri' + uri)
+    print(root)
     file_path = uri.split('/')
+    file_path.remove('')
     print(file_path)
     body_content = io.open(root, 'rb')
     body_content = body_content.read()
     file_type = file_path[-1].split('.')
     file_type = file_type[-1]
-
     return (body_content, file_type)
 
 
@@ -48,8 +50,9 @@ def response_ok(body_content):
     body = body_content[0]
     # bytes_ = body.encode('utf-8')
     fourth_line = u'Content-Length: {}'.format(len(body))
-    string_list = [first, second_line, date, fourth_line, header_break, body]
-    string_list = '\r\n'.join(string_list)
+    string_list = [first, second_line, date, fourth_line, header_break]
+    string_list = '\r\n'.join(string_list).encode('utf-8')
+    string_list = string_list + body
     return string_list
 
 
@@ -90,7 +93,7 @@ def server():
                 try:
                     uri = parse_request(full_string)
                     body_content = resolve_uri(uri)
-                    conn.sendall(response_ok(body_content).encode('utf-8'))
+                    conn.sendall(response_ok(body_content))
                 except NameError('Method not GET'):
                     conn.sendall(response_error(u'405 Method Not Allowed'))
                 except TypeError('HTTP protol incorrect'):
