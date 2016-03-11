@@ -8,17 +8,22 @@ import os
 
 def resolve_uri(uri):
     """Return request body and file type."""
+    root = os.getcwd() + '/webroot'
     file_path = uri.split('/')
-    print(file_path)
-    if file_path[0] != 'webroot':
-        response_error(u'400 Bad Request')
-        raise LookupError('File path not found.')
-    else:
-        file = file_path[-1].split('.')
-        file_type = file[1]
-        file_name = file[0]
-        if file_type == 'png' or file_type == 'jpg':
-            pass
+    for index in file_path:
+        if index[0] == '.':
+            raise OSError(PermissionError('malicious URI'))
+    # if
+    # print(file_path)
+    # if file_path[0] != 'webroot':
+    #     response_error(u'400 Bad Request')
+    #     raise LookupError('File path not found.')
+    # else:
+    #     file = file_path[-1].split('.')
+    #     file_type = file[1]
+    #     file_name = file[0]
+    #     if file_type == 'png' or file_type == 'jpg':
+    pass
 
 
 def parse_request(request):
@@ -90,16 +95,17 @@ def server():
                 print(full_string)
                 parse_request(full_string)
                 try:
-                    conn.sendall(response_ok(parse_request(full_string)).encode('utf-8'))
+                    uri = parse_request(full_string)
+                    # body_content = resolve_uri(full_string)
+                    conn.sendall(response_ok(uri).encode('utf-8'))
                 except NameError('Method not GET'):
                     conn.sendall(response_error(u'405 Method Not Allowed'))
                 except TypeError('HTTP protol incorrect'):
                     conn.sendall(response_error(u'505 HTTP Version Not Supported'))
                 except SyntaxError('URI incorrect'):
                     conn.sendall(response_error(u'404 Page Not Found'))
-            except:
-                response_error()
-                raise
+            except SystemError('Request not fully received'):
+                conn.sendall(response_error())
     except KeyboardInterrupt:
         conn.close()
     finally:
