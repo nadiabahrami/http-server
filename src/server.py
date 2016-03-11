@@ -4,32 +4,46 @@ from __future__ import unicode_literals
 import socket
 import email.utils
 
+RESOURCES = {
+    'images':
+
+}
+
+
 
 def resolve_uri(uri):
-
+    """Return request body and file type."""
+    file_path = uri.split('/')
+    print(file_path)
+    if file_path[0] != 'webroot':
+        response_error(u'400 Bad Request')
+        raise LookupError('File path not found.')
+    else:
+        file = file_path[-1].split('.')
+        file_type = file[1]
+        file_name = file[0]
+        if file_type == 'png' or file_type == 'jpg':
+            return
 
 
 
 def parse_request(request):
     """Parse and validate request to confirm parts are correct."""
     lines = request.split('\r\n')
-    try:
-        lines[1][:3] == 'GET'
-    except:
-        response_error(u'405 Method Not Allowed')
+    if:
+        lines[0][:3] == 'GET'
+    else:
         raise RuntimeError('Only accepts GET requests.')
-    try:
+    if:
         lines[1][-8:] == 'HTTP/1.1'
-    except:
-        response_error(u'505 HTTP Version Not Supported')
-        raise RuntimeError('Only accepts HTTP/1.1 protocol requests.')
-    try:
+    else:
+        raise TypeError
+    if:
         len(lines[1].split()) == 3 and lines[1][0] == '/'
         uri = lines[1].split()
         lines = resolve_uri(uri)
-    except:
-        response_error(u'404 Page Not Found')
-        raise RuntimeError('URI not properly formatted.')
+    else:
+        raise SyntaxError
     return lines
 
 
@@ -99,6 +113,8 @@ if __name__ == '__main__':
     server()
 
 
-
+"""u'405 Method Not Allowed'
+u'505 HTTP Version Not Supported'
+u'404 Page Not Found'"""
 
 
