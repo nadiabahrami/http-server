@@ -50,7 +50,7 @@ def test_parse_method():
     """Assert for correct method."""
     from server import parse_request
     request = 'PUT / HTTP/1.1'
-    with pytest.raises(RuntimeError):
+    with pytest.raises(NameError):
         parse_request(request)
 
 
@@ -58,7 +58,7 @@ def test_parse_protocol():
     """Assert for correct method."""
     from server import parse_request
     request = 'GET / HTTP/2.1'
-    with pytest.raises(RuntimeError):
+    with pytest.raises(TypeError):
         parse_request(request)
 
 
@@ -66,7 +66,7 @@ def test_parse_uri():
     """Assert for correct method."""
     from server import parse_request
     request = 'GET HTTP/1.1'
-    with pytest.raises(RuntimeError):
+    with pytest.raises(SyntaxError):
         print(parse_request(request))
 
 
