@@ -12,10 +12,11 @@ def client(message):
     client = socket.socket(*stream_info[:3])
     client.connect(stream_info[-1])
     modulo_true = False
-    if len(message.encode('utf-8')) % 8 == 0:
-        message = message + '\n'
-        modulo_true = True
+    # if len(message.encode('utf-8')) % 8 == 0:
+    #     message = message + '\n'
+    #     modulo_true = True
     client.sendall(message.encode('utf-8'))
+    client.shutdown(1)
     buffer_length = 8
     reply_complete = False
     full_string = ""
@@ -25,9 +26,9 @@ def client(message):
         if len(part) < buffer_length:
             reply_complete = True
             client.close()
-    if modulo_true is True:
-        modulo_true is False
-        full_string = full_string[:-1]
+    # if modulo_true is True:
+    #     modulo_true is False
+    #     full_string = full_string[:-1]
     print(full_string)
     return full_string
 

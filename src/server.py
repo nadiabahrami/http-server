@@ -12,8 +12,8 @@ def response_ok():
     date_line = u'Date: ' + email.utils.formatdate(usegmt=True)
     header_break = u''
     body = u'It is all good'
-    bytes = body.encode('utf-8')
-    fourth_line = u'Content-Length: {}'.format(len(bytes))
+    bytes_ = body.encode('utf-8')
+    fourth_line = u'Content-Length: {}'.format(len(bytes_))
     string_list = [first_line, second_line, date_line, fourth_line, header_break, body]
     string_list = '\r\n'.join(string_list)
     return string_list
@@ -26,8 +26,8 @@ def response_error():
     date_line = email.utils.formatdate(usegmt=True)
     header_break = u''
     body = u'The system is down'
-    bytes = body.encode('utf-8')
-    fourth_line = u'Content-Length: {}'.format(len(bytes))
+    bytes_ = body.encode('utf-8')
+    fourth_line = u'Content-Length: {}'.format(len(bytes_))
     string_list = [first_line, second_line, date_line, fourth_line, header_break, body]
     string_list = '\r\n'.join(string_list)
     return string_list
@@ -46,27 +46,23 @@ def server():
             try:
                 buffer_length = 8
                 reply_complete = False
-                full_string = u""
+                full_string = ""
                 while not reply_complete:
                     part = conn.recv(buffer_length)
-                    full_string = full_string + part.decode('utf-8')
+                    full_string = full_string + part
+                    full_string = full_string.decode('utf-8')
                     if len(part) < buffer_length:
                         reply_complete = True
                 print(full_string)
                 conn.sendall(response_ok().encode('utf-8'))
                 server.listen(1)
                 conn, addr = server.accept()
-            except:
-                response_error()
-                raise
+            except SystemError('Request not fully received'):
+                conn.sendall(response_error())
     except KeyboardInterrupt:
         conn.close()
+    finally:
         server.close()
 
 if __name__ == '__main__':
     server()
-
-
-
-
-
