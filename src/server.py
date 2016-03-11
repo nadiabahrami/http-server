@@ -15,11 +15,14 @@ def resolve_uri(uri):
     file_path = uri.split('/')
     file_path.remove('')
     print(file_path)
-    body_content = io.open(root, 'rb')
-    body_content = body_content.read()
-    file_type = file_path[-1].split('.')
-    file_type = file_type[-1]
-    return (body_content, file_type)
+    if io.open(root, 'rb'):
+        body_content = io.open(root, 'rb')
+        body_content = body_content.read()
+        file_type = file_path[-1].split('.')
+        file_type = file_type[-1]
+        return (body_content, file_type)
+    else:
+        raise IOError('File not found')
 
 
 def parse_request(request):
@@ -92,13 +95,17 @@ def server():
                 print(full_string)
                 try:
                     uri = parse_request(full_string)
+                    print(uri)
                     body_content = resolve_uri(uri)
+                    print(body_content)
                     conn.sendall(response_ok(body_content))
                 except NameError('Method not GET'):
                     conn.sendall(response_error(u'405 Method Not Allowed'))
                 except TypeError('HTTP protol incorrect'):
                     conn.sendall(response_error(u'505 HTTP Version Not Supported'))
                 except SyntaxError('URI incorrect'):
+                    conn.sendall(response_error(u'404 Page Not Found'))
+                except IOError('File not found'):
                     conn.sendall(response_error(u'404 Page Not Found'))
             except SystemError('Request not fully received'):
                 conn.sendall(response_error())
