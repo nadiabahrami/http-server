@@ -4,26 +4,20 @@ from __future__ import unicode_literals
 import socket
 import email.utils
 import os
+import io
 
 
 def resolve_uri(uri):
     """Return request body and file type."""
-    root = os.getcwd() + '/webroot'
+    root = os.getcwd() + '/webroot' + uri
     file_path = uri.split('/')
-    for index in file_path:
-        if index[0] == '.':
-            raise OSError(PermissionError('malicious URI'))
-    # if
-    # print(file_path)
-    # if file_path[0] != 'webroot':
-    #     response_error(u'400 Bad Request')
-    #     raise LookupError('File path not found.')
-    # else:
-    #     file = file_path[-1].split('.')
-    #     file_type = file[1]
-    #     file_name = file[0]
-    #     if file_type == 'png' or file_type == 'jpg':
-    pass
+    print(file_path)
+    body_content = io.open(root, 'rb')
+    body_content = body_content.read()
+    file_type = file_path[-1].split('.')
+    file_type = file_type[-1]
+
+    return (body_content, file_type)
 
 
 def parse_request(request):
@@ -45,15 +39,15 @@ def parse_request(request):
     return words[1]
 
 
-def response_ok(uri):
+def response_ok(body_content):
     """Return 200 ok."""
     first = u'HTTP/1.1 200 OK'
     second_line = u'Content-Type: text/plain; charset=utf-8'
     date = u'Date: ' + email.utils.formatdate(usegmt=True)
     header_break = u''
-    body = uri
-    bytes_ = body.encode('utf-8')
-    fourth_line = u'Content-Length: {}'.format(len(bytes_))
+    body = body_content[0]
+    # bytes_ = body.encode('utf-8')
+    fourth_line = u'Content-Length: {}'.format(len(body))
     string_list = [first, second_line, date, fourth_line, header_break, body]
     string_list = '\r\n'.join(string_list)
     return string_list
@@ -93,11 +87,10 @@ def server():
                     if len(part) < buffer_length:
                         reply_complete = True
                 print(full_string)
-                parse_request(full_string)
                 try:
                     uri = parse_request(full_string)
-                    # body_content = resolve_uri(full_string)
-                    conn.sendall(response_ok(uri).encode('utf-8'))
+                    body_content = resolve_uri(uri)
+                    conn.sendall(response_ok(body_content).encode('utf-8'))
                 except NameError('Method not GET'):
                     conn.sendall(response_error(u'405 Method Not Allowed'))
                 except TypeError('HTTP protol incorrect'):
