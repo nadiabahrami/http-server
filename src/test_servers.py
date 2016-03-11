@@ -47,7 +47,7 @@ def test_response_error():
 
 
 def test_parse_method():
-    """Assert for correct method."""
+    """Assert for correct request method."""
     from server import parse_request
     request = 'PUT / HTTP/1.1'
     with pytest.raises(NameError):
@@ -55,7 +55,7 @@ def test_parse_method():
 
 
 def test_parse_protocol():
-    """Assert for correct method."""
+    """Assert for correct request protol."""
     from server import parse_request
     request = 'GET / HTTP/2.1'
     with pytest.raises(TypeError):
@@ -63,7 +63,7 @@ def test_parse_protocol():
 
 
 def test_parse_uri():
-    """Assert for correct method."""
+    """Assert for correct request uri."""
     from server import parse_request
     request = 'GET HTTP/1.1'
     with pytest.raises(SyntaxError):
@@ -77,5 +77,3 @@ def test_parse():
     response = response_error(request)
     response = response.split()
     assert response[1] == '404'
-
-
