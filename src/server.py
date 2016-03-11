@@ -4,12 +4,6 @@ from __future__ import unicode_literals
 import socket
 import email.utils
 
-RESOURCES = {
-    'images':
-
-}
-
-
 
 def resolve_uri(uri):
     """Return request body and file type."""
@@ -23,28 +17,26 @@ def resolve_uri(uri):
         file_type = file[1]
         file_name = file[0]
         if file_type == 'png' or file_type == 'jpg':
-            return
-
+            pass
 
 
 def parse_request(request):
     """Parse and validate request to confirm parts are correct."""
     lines = request.split('\r\n')
-    if:
-        lines[0][:3] == 'GET'
+    words = lines[0].split()
+    if lines[0][:3] == 'GET':
+        pass
     else:
-        raise RuntimeError('Only accepts GET requests.')
-    if:
-        lines[1][-8:] == 'HTTP/1.1'
+        raise NameError
+    if lines[0][-8:] == 'HTTP/1.1':
+        pass
     else:
         raise TypeError
-    if:
-        len(lines[1].split()) == 3 and lines[1][0] == '/'
-        uri = lines[1].split()
-        lines = resolve_uri(uri)
+    if len(words) == 3 and words[1][0] == '/':
+        pass
     else:
         raise SyntaxError
-    return lines
+    return words[1]
 
 
 def response_ok(uri):
@@ -95,6 +87,7 @@ def server():
                     if len(part) < buffer_length:
                         reply_complete = True
                 print(full_string)
+                parse_request(full_string)
                 try:
                     conn.sendall(response_ok(parse_request(full_string)).encode('utf-8'))
                 except:
