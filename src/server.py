@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 import socket
 import email.utils
+import os
 
 
 def resolve_uri(uri):
@@ -74,9 +75,9 @@ def server():
     address = ('127.0.0.1', 5001)
     server.bind(address)
     server.listen(1)
-    conn, addr = server.accept()
     try:
         while True:
+            conn, addr = server.accept()
             try:
                 buffer_length = 8
                 reply_complete = False
@@ -90,10 +91,12 @@ def server():
                 parse_request(full_string)
                 try:
                     conn.sendall(response_ok(parse_request(full_string)).encode('utf-8'))
-                except:
-                    pass
-                # server.listen(1)
-                conn, addr = server.accept()
+                except NameError('Method not GET'):
+                    conn.sendall(response_error(u'405 Method Not Allowed'))
+                except TypeError('HTTP protol incorrect'):
+                    conn.sendall(response_error(u'505 HTTP Version Not Supported'))
+                except SyntaxError('URI incorrect'):
+                    conn.sendall(response_error(u'404 Page Not Found'))
             except:
                 response_error()
                 raise
@@ -104,10 +107,3 @@ def server():
 
 if __name__ == '__main__':
     server()
-
-
-"""u'405 Method Not Allowed'
-u'505 HTTP Version Not Supported'
-u'404 Page Not Found'"""
-
-
