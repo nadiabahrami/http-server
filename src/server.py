@@ -15,20 +15,26 @@ def resolve_uri(uri):
     file_path = uri.split('/')
     file_path.remove('')
     print(file_path)
-    if io.open(root, 'rb'):
+    try:
+        io.open(root, 'rb')
         body_content = io.open(root, 'rb')
         body_content = body_content.read()
         file_type = file_path[-1].split('.')
         file_type = file_type[-1]
-        return (body_content, file_type)
-    else:
-        raise IOError('File not found')
+        if file_type == 'jpg' or file_type == 'png':
+            return (body_content, file_type)
+        else:
+            return (body_content.encode('utf-8'), file_type)
+    except IOError:
+        return False
 
 
 def parse_request(request):
     """Parse and validate request to confirm parts are correct."""
     lines = request.split('\r\n')
+    print(lines)
     words = lines[0].split()
+    print(words)
     if lines[0][:3] == 'GET':
         pass
     else:
@@ -47,15 +53,16 @@ def parse_request(request):
 def response_ok(body_content):
     """Return 200 ok."""
     first = u'HTTP/1.1 200 OK'
-    second_line = u'Content-Type: text/plain; charset=utf-8'
+    second_line = u'Content-Type:' + body_content[1] + '; charset=utf-8'
     date = u'Date: ' + email.utils.formatdate(usegmt=True)
     header_break = u''
     body = body_content[0]
     # bytes_ = body.encode('utf-8')
     fourth_line = u'Content-Length: {}'.format(len(body))
     string_list = [first, second_line, date, fourth_line, header_break]
-    string_list = '\r\n'.join(string_list).encode('utf-8')
-    string_list = string_list + body
+    string_list = '\r\n'.join(string_list) + '\r\n'
+    string_list = string_list.encode('utf-8') + body
+    print(string_list)
     return string_list
 
 
@@ -97,18 +104,27 @@ def server():
                     uri = parse_request(full_string)
                     print(uri)
                     body_content = resolve_uri(uri)
-                    print(body_content)
-                    conn.sendall(response_ok(body_content))
+                    if body_content:
+                        print(body_content)
+                        conn.send(response_ok(body_content))
+                    else:
+                        conn.sendall(response_error(u'404 Page Not Found'))
+                    conn.close()
                 except NameError('Method not GET'):
                     conn.sendall(response_error(u'405 Method Not Allowed'))
+                    conn.close()
                 except TypeError('HTTP protol incorrect'):
                     conn.sendall(response_error(u'505 HTTP Version Not Supported'))
+                    conn.close()
                 except SyntaxError('URI incorrect'):
                     conn.sendall(response_error(u'404 Page Not Found'))
+                    conn.close()
                 except IOError('File not found'):
                     conn.sendall(response_error(u'404 Page Not Found'))
+                    conn.close()
             except SystemError('Request not fully received'):
                 conn.sendall(response_error())
+                conn.close()
     except KeyboardInterrupt:
         conn.close()
     finally:
