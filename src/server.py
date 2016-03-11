@@ -8,22 +8,20 @@ import email.utils
 def parse_request(request):
     """Parse and validate request to confirm parts are correct."""
     lines = request.split('\r\n')
-    try:
-        lines[1][:3] == 'GET'
-    except:
-        response_error(u'405 Method Not Allowed')
-        raise RuntimeError('Only accepts GET requests.')
-    try:
-        lines[1][-8:] == 'HTTP/1.1'
-    except:
-        response_error(u'505 HTTP Version Not Supported')
-        raise RuntimeError('Only accepts HTTP/1.1 protocol requests.')
-    try:
-        len(lines[1].split()) == 3 and lines[1][0] == '/'
-    except:
-        response_error(u'404 Page Not Found')
-        raise RuntimeError('URI not properly formatted.')
-    return lines[1]
+    words = lines[0].split()
+    if lines[0][:3] == 'GET':
+        pass
+    else:
+        raise NameError
+    if lines[0][-8:] == 'HTTP/1.1':
+        pass
+    else:
+        raise TypeError
+    if len(words) == 3 and words[1][0] == '/':
+        pass
+    else:
+        raise SyntaxError
+    return words[1]
 
 
 def response_ok(uri):
@@ -33,8 +31,8 @@ def response_ok(uri):
     date = u'Date: ' + email.utils.formatdate(usegmt=True)
     header_break = u''
     body = uri
-    bytes = body.encode('utf-8')
-    fourth_line = u'Content-Length: {}'.format(len(bytes))
+    bytes_ = body.encode('utf-8')
+    fourth_line = u'Content-Length: {}'.format(len(bytes_))
     string_list = [first, second_line, date, fourth_line, header_break, body]
     string_list = '\r\n'.join(string_list)
     return string_list
@@ -47,8 +45,8 @@ def response_error(error='500 Internal Server Error'):
     date = email.utils.formatdate(usegmt=True)
     header_break = u''
     body = u'The system is down'
-    bytes = body.encode('utf-8')
-    fourth_line = u'Content-Length: {}'.format(len(bytes))
+    bytes_ = body.encode('utf-8')
+    fourth_line = u'Content-Length: {}'.format(len(bytes_))
     string_list = [first, second_line, date, fourth_line, header_break, body]
     string_list = '\r\n'.join(string_list)
     return string_list
@@ -61,9 +59,9 @@ def server():
     address = ('127.0.0.1', 5001)
     server.bind(address)
     server.listen(1)
-    conn, addr = server.accept()
     try:
         while True:
+            conn, addr = server.accept()
             try:
                 buffer_length = 8
                 reply_complete = False
@@ -75,14 +73,16 @@ def server():
                         reply_complete = True
                 print(full_string)
                 try:
-                    conn.sendall(response_ok(parse_request(full_string)).encode('utf-8'))
-                except:
-                    pass
-                # server.listen(1)
-                conn, addr = server.accept()
-            except:
-                response_error()
-                raise
+                    uri = parse_request(full_string)
+                    conn.sendall(response_ok(uri).encode('utf-8'))
+                except NameError('Method not GET'):
+                    conn.sendall(response_error(u'405 Method Not Allowed'))
+                except TypeError('HTTP protol incorrect'):
+                    conn.sendall(response_error(u'505 HTTP Version Not Supported'))
+                except SyntaxError('URI incorrect'):
+                    conn.sendall(response_error(u'404 Page Not Found'))
+            except SystemError('Request not fully received'):
+                conn.sendall(response_error())
     except KeyboardInterrupt:
         conn.close()
     finally:

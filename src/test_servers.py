@@ -10,8 +10,8 @@ def response_ok():
     second_line = u'Content-Type: text/plain; charset=utf-8'
     header_break = u''
     body = u'/'
-    bytes = body.encode('utf-8')
-    fourth_line = u'Content-Length: {}'.format(len(bytes))
+    bytes_ = body.encode('utf-8')
+    fourth_line = u'Content-Length: {}'.format(len(bytes_))
     string_list = [first, second_line, fourth_line, header_break, body]
     string_list = '\r\n'.join(string_list)
     return string_list
@@ -50,32 +50,38 @@ def test_parse_method():
     """Assert for correct method."""
     from server import parse_request
     request = 'PUT / HTTP/1.1'
-    with pytest.raises(RuntimeError):
+    with pytest.raises(NameError):
         parse_request(request)
 
 
 def test_parse_protocol():
-    """Assert for correct method."""
+    """Assert for correct protocol."""
     from server import parse_request
     request = 'GET / HTTP/2.1'
-    with pytest.raises(RuntimeError):
+    with pytest.raises(TypeError):
         parse_request(request)
 
 
 def test_parse_uri():
-    """Assert for correct method."""
+    """Assert for correct uri."""
     from server import parse_request
     request = 'GET HTTP/1.1'
-    with pytest.raises(RuntimeError):
+    with pytest.raises(SyntaxError):
         print(parse_request(request))
 
 
 def test_parse():
+    """Assert that parse returns a uri when  request is correct."""
+    from server import parse_request
+    request = 'GET /whatever HTTP/1.1'
+    run = parse_request(request)
+    assert run == '/whatever'
+
+
+def test_response_error_status():
     """Assert 404 error works correctly."""
     from server import response_error
     request = u'404 Page Not Found'
     response = response_error(request)
     response = response.split()
     assert response[1] == '404'
-
-
