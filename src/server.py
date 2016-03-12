@@ -13,8 +13,29 @@ def resolve_uri(uri):
     print('this is the uri' + uri)
     print(root)
     file_path = uri.split('/')
-    file_path.remove('')
     print(file_path)
+    file_path = [item for item in file_path if item]
+    print(file_path)
+    if file_path == []:
+        file_type = u'text/html'
+        list_ = os.listdir(root)
+        compiler = u'<ul>'
+        for file in list_:
+            compiler = compiler + '<li><a href="' + file + '">' + file + '</a></li>'
+        compiler = compiler + '</ul>'
+        print(compiler)
+        return (compiler.encode('utf-8'), file_type)
+    file_type = file_path[-1].split('.')
+    if len(file_type) == 1:
+        file_type = u'text/html'
+        list_ = os.listdir(root)
+        print(list_)
+        compiler = u'<ul>'
+        for file in list_:
+            compiler = compiler + '<li><a href="' + uri + '/' + file + '">' + file + '</a></li>'
+        compiler = compiler + '</ul>'
+        print(compiler)
+        return (compiler.encode('utf-8'), file_type)
     try:
         io.open(root, 'rb')
         body_content = io.open(root, 'rb')
