@@ -10,38 +10,33 @@ import io
 def resolve_uri(uri):
     """Return request body and file type."""
     root = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'webroot')
-    uri_path = os.path.join(root, uri[1:])
-    file_path = uri.split('/')
-    file_path = [item for item in file_path if item]
-    if file_path == []:
-        file_type = u'text/html'
-        list_ = os.listdir(uri_path)
-        compiler = u'<ul>'
-        for file in list_:
-            compiler += '<li><a href="{}">{}</a></li>'.format(file, file)
-        compiler += '</ul>'
-        return (compiler.encode('utf-8'), file_type)
-    file_type = file_path[-1].split('.')
+    full_path = os.path.join(root, uri[1:])
+    path_list = uri.split('/')
+    path_list = [item for item in path_list if item]
+    if path_list == []:
+        return html_compiler(full_path)
+    file_type = path_list[-1].split('.')
     try:
         if len(file_type) == 1:
-            file_type = u'text/html'
-            list_ = os.listdir(uri_path)
-            compiler = u'<ul>'
-            for file in list_:
-                compiler += '<li><a href="{}/{}">{}</a></li>'.format(uri, file, file)
-            compiler += '</ul>'
-            return (compiler.encode('utf-8'), file_type)
-        file = io.open(uri_path, 'rb')
+            return html_compiler(full_path, uri)
+        file = io.open(full_path, 'rb')
         body_content = file.read()
-        file_type = file_path[-1].split('.')
         file_type = file_type[-1]
-        if file_type == 'jpg' or file_type == 'png':
-            return (body_content, file_type)
-        else:
-            return (body_content, file_type)
+        return (body_content, file_type)
     except (IOError, OSError):
-        print('Iam here fuck')
+        print('I am here fuck')
         return False
+
+
+def html_compiler(full_path, uri=''):
+    """Return a byte encoded html file."""
+    file_type = u'text/html'
+    list_ = os.listdir(full_path)
+    html = u'<ul>'
+    for file in list_:
+        html += '<li><a href="{}/{}">{}</a></li>'.format(uri, file, file)
+    html += '</ul>'
+    return (html.encode('utf-8'), file_type)
 
 
 def parse_request(request):
@@ -63,13 +58,13 @@ def parse_request(request):
     return words[1]
 
 
-def response_ok(body_content):
+def response_ok(body_tuple):
     """Return 200 ok."""
     first = u'HTTP/1.1 200 OK'
-    second_line = u'Content-Type:' + body_content[1] + '; charset=utf-8'
+    second_line = u'Content-Type:' + body_tuple[1] + '; charset=utf-8'
     date = u'Date: ' + email.utils.formatdate(usegmt=True)
     header_break = u''
-    body = body_content[0]
+    body = body_tuple[0]
     fourth_line = u'Content-Length: {}'.format(len(body))
     string_list = [first, second_line, date, fourth_line, header_break]
     string_list = '\r\n'.join(string_list) + '\r\n'
@@ -113,9 +108,9 @@ def server():
                 print(full_string)
                 try:
                     uri = parse_request(full_string)
-                    body_content = resolve_uri(uri)
-                    if body_content:
-                        conn.send(response_ok(body_content))
+                    body_tuple = resolve_uri(uri)
+                    if body_tuple:
+                        conn.send(response_ok(body_tuple))
                     else:
                         conn.sendall(response_error(u'404 Page Not Found'))
                     conn.close()
