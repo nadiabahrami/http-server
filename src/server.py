@@ -10,12 +10,8 @@ import io
 def resolve_uri(uri):
     """Return request body and file type."""
     root = os.getcwd() + '/webroot' + uri
-    print('this is the uri' + uri)
-    print(root)
     file_path = uri.split('/')
-    print(file_path)
     file_path = [item for item in file_path if item]
-    print(file_path)
     if file_path == []:
         file_type = u'text/html'
         list_ = os.listdir(root)
@@ -23,18 +19,15 @@ def resolve_uri(uri):
         for file in list_:
             compiler = compiler + '<li><a href="' + file + '">' + file + '</a></li>'
         compiler = compiler + '</ul>'
-        print(compiler)
         return (compiler.encode('utf-8'), file_type)
     file_type = file_path[-1].split('.')
     if len(file_type) == 1:
         file_type = u'text/html'
         list_ = os.listdir(root)
-        print(list_)
         compiler = u'<ul>'
         for file in list_:
             compiler = compiler + '<li><a href="' + uri + '/' + file + '">' + file + '</a></li>'
         compiler = compiler + '</ul>'
-        print(compiler)
         return (compiler.encode('utf-8'), file_type)
     try:
         io.open(root, 'rb')
@@ -53,9 +46,7 @@ def resolve_uri(uri):
 def parse_request(request):
     """Parse and validate request to confirm parts are correct."""
     lines = request.split('\r\n')
-    print(lines)
     words = lines[0].split()
-    print(words)
     if lines[0][:3] == 'GET':
         pass
     else:
@@ -78,12 +69,10 @@ def response_ok(body_content):
     date = u'Date: ' + email.utils.formatdate(usegmt=True)
     header_break = u''
     body = body_content[0]
-    # bytes_ = body.encode('utf-8')
     fourth_line = u'Content-Length: {}'.format(len(body))
     string_list = [first, second_line, date, fourth_line, header_break]
     string_list = '\r\n'.join(string_list) + '\r\n'
     string_list = string_list.encode('utf-8') + body
-    print(string_list)
     return string_list
 
 
@@ -123,10 +112,8 @@ def server():
                 print(full_string)
                 try:
                     uri = parse_request(full_string)
-                    print(uri)
                     body_content = resolve_uri(uri)
                     if body_content:
-                        print(body_content)
                         conn.send(response_ok(body_content))
                     else:
                         conn.sendall(response_error(u'404 Page Not Found'))
