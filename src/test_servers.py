@@ -2,6 +2,23 @@
 """Test client module."""
 import pytest
 
+TESTING_TABLE = [
+    ('/', ''),
+    ('/images', ),
+    ('/sample.txt', ('This is a very simple text file. Just to show that we can serve it up. It is three lines long.').encode('utf-8')),
+    ('/images/Sample_Scene_Balls.jpg',),
+    ('/whateveryouwant', False)
+]
+
+
+@pytest.mark.paramatrize('uri, result', TESTING_TABLE)
+def test_resolve_uri(uri, result):
+    """Return correct body."""
+    from server import resolve_uri
+    assert resolve_uri(uri) == result
+
+
+
 
 @pytest.fixture(scope="function")
 def response_ok():
@@ -10,8 +27,8 @@ def response_ok():
     second_line = u'Content-Type: text/plain; charset=utf-8'
     header_break = u''
     body = u'/'
-    bytes = body.encode('utf-8')
-    fourth_line = u'Content-Length: {}'.format(len(bytes))
+    bytes_ = body.encode('utf-8')
+    fourth_line = u'Content-Length: {}'.format(len(bytes_))
     string_list = [first, second_line, fourth_line, header_break, body]
     string_list = '\r\n'.join(string_list)
     return string_list
@@ -77,3 +94,5 @@ def test_parse():
     response = response_error(request)
     response = response.split()
     assert response[1] == '404'
+
+

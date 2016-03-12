@@ -19,6 +19,7 @@ def resolve_uri(uri):
         for file in list_:
             compiler = compiler + '<li><a href="' + file + '">' + file + '</a></li>'
         compiler = compiler + '</ul>'
+        print(compiler)
         return (compiler.encode('utf-8'), file_type)
     file_type = file_path[-1].split('.')
     if len(file_type) == 1:
@@ -28,6 +29,7 @@ def resolve_uri(uri):
         for file in list_:
             compiler = compiler + '<li><a href="' + uri + '/' + file + '">' + file + '</a></li>'
         compiler = compiler + '</ul>'
+        print(compiler)
         return (compiler.encode('utf-8'), file_type)
     try:
         io.open(root, 'rb')
@@ -36,8 +38,10 @@ def resolve_uri(uri):
         file_type = file_path[-1].split('.')
         file_type = file_type[-1]
         if file_type == 'jpg' or file_type == 'png':
+            print(body_content)
             return (body_content, file_type)
         else:
+            print(body_content.decode('utf-8'))
             return (body_content.encode('utf-8'), file_type)
     except IOError:
         return False
