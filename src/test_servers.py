@@ -5,8 +5,7 @@ import pytest
 TESTING_TABLE = [
     ('/', ''),
     ('/images', ),
-    ('/sample.txt', ('This is a very simple text file. Just to show that we can serve it up. It is three lines long.').encode('utf-8')),
-    ('/images/Sample_Scene_Balls.jpg',),
+    ('/sample.txt', (('This is a very simple text file. Just to show that we can serve it up. It is three lines long.').encode('utf-8'), 'txt')),
     ('/whateveryouwant', False)
 ]
 
@@ -16,6 +15,13 @@ def test_resolve_uri(uri, result):
     """Return correct body."""
     from server import resolve_uri
     assert resolve_uri(uri) == result
+
+
+def test_resolve_ur_images():
+    """Test image files are present."""
+    from server import resolve_uri
+    our_tuple = resolve_uri('/images/Sample_Scene_Balls.jpg')
+    assert our_tuple[1] == 'jpg'
 
 
 
