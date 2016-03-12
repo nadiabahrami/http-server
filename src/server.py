@@ -9,41 +9,38 @@ import io
 
 def resolve_uri(uri):
     """Return request body and file type."""
-    root = os.getcwd() + '/webroot' + uri
+    root = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'webroot')
+    uri_path = os.path.join(root, uri[1:])
     file_path = uri.split('/')
     file_path = [item for item in file_path if item]
     if file_path == []:
         file_type = u'text/html'
-        list_ = os.listdir(root)
+        list_ = os.listdir(uri_path)
         compiler = u'<ul>'
         for file in list_:
-            compiler = compiler + '<li><a href="' + file + '">' + file + '</a></li>'
-        compiler = compiler + '</ul>'
-        print(compiler)
+            compiler += '<li><a href="{}">{}</a></li>'.format(file, file)
+        compiler += '</ul>'
         return (compiler.encode('utf-8'), file_type)
     file_type = file_path[-1].split('.')
-    if len(file_type) == 1:
-        file_type = u'text/html'
-        list_ = os.listdir(root)
-        compiler = u'<ul>'
-        for file in list_:
-            compiler = compiler + '<li><a href="' + uri + '/' + file + '">' + file + '</a></li>'
-        compiler = compiler + '</ul>'
-        print(compiler)
-        return (compiler.encode('utf-8'), file_type)
     try:
-        io.open(root, 'rb')
-        body_content = io.open(root, 'rb')
-        body_content = body_content.read()
+        if len(file_type) == 1:
+            file_type = u'text/html'
+            list_ = os.listdir(uri_path)
+            compiler = u'<ul>'
+            for file in list_:
+                compiler += '<li><a href="{}/{}">{}</a></li>'.format(uri, file, file)
+            compiler += '</ul>'
+            return (compiler.encode('utf-8'), file_type)
+        file = io.open(uri_path, 'rb')
+        body_content = file.read()
         file_type = file_path[-1].split('.')
         file_type = file_type[-1]
         if file_type == 'jpg' or file_type == 'png':
-            print(body_content)
             return (body_content, file_type)
         else:
-            print(body_content.decode('utf-8'))
-            return (body_content.encode('utf-8'), file_type)
-    except IOError:
+            return (body_content, file_type)
+    except (IOError, OSError):
+        print('Iam here fuck')
         return False
 
 

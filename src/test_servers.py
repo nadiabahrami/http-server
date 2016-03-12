@@ -2,28 +2,42 @@
 """Test client module."""
 import pytest
 
-TESTING_TABLE = [
-    ('/', ''),
-    ('/images', ),
-    ('/sample.txt', (('This is a very simple text file. Just to show that we can serve it up. It is three lines long.').encode('utf-8'), 'txt')),
-    ('/whateveryouwant', False)
-]
 
-
-@pytest.mark.paramatrize('uri, result', TESTING_TABLE)
-def test_resolve_uri(uri, result):
-    """Return correct body."""
+def test_resolve_uri_nonexistant_file():
+    """Assert function returns the correct body."""
     from server import resolve_uri
-    assert resolve_uri(uri) == result
+    path = resolve_uri('/WTF.txt')
+    result = False
+    assert path == result
 
 
-def test_resolve_ur_images():
+def test_resolve_uri_nonexistant_dir():
+    """Assert function returns the correct body."""
+    from server import resolve_uri
+    path = resolve_uri('/WTF')
+    result = False
+    assert path == result
+
+
+def test_resolve_uri_images():
     """Test image files are present."""
     from server import resolve_uri
     our_tuple = resolve_uri('/images/Sample_Scene_Balls.jpg')
     assert our_tuple[1] == 'jpg'
 
 
+def test_resolve_uri_files():
+    """Test image files are present."""
+    from server import resolve_uri
+    our_tuple = resolve_uri('/sample.txt')
+    assert our_tuple[1] == 'txt'
+
+
+def test_resolve_uri_dir():
+    """Test image files are present."""
+    from server import resolve_uri
+    our_tuple = resolve_uri('/images')
+    assert our_tuple[1] == 'text/html'
 
 
 @pytest.fixture(scope="function")
@@ -100,5 +114,3 @@ def test_parse():
     response = response_error(request)
     response = response.split()
     assert response[1] == '404'
-
-
