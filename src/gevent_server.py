@@ -4,19 +4,10 @@ from server import response_error
 from server import response_ok
 from server import resolve_uri
 from server import parse_request
-print('hey I am a file')
 
 
 def server(conn, address):
     """Return message to client."""
-    # server = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-    # server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    # address = ('127.0.0.1', 5001)
-    # server.bind(address)
-    # server.listen(1)
-    # try:
-    #     while True:
-    #         conn, addr = server.accept()
     try:
         buffer_length = 8
         reply_complete = False
@@ -57,8 +48,6 @@ def server(conn, address):
 
 
 if __name__ == '__main__':
-    import pdb; pdb.set_trace()
-    print('You are here')
     from gevent.server import StreamServer
     from gevent.monkey import patch_all
     patch_all()
